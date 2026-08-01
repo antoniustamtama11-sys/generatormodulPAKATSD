@@ -26,9 +26,9 @@ nip_penulis = st.sidebar.text_input("NIP Penulis:", "198211212024211003")
 col1, col2 = st.columns(2)
 
 with col1:
-    mapel = st.text_input("Mata Pelajaran:", "Pendidikan Agama Katolik")
+    mapel = st.text_input("Mata Pelajaran:", "Pendidikan Agama Katolik dan Budi Pekerti")
     kelas_fase = st.text_input("Kelas / Fase:", "Kelas ... / Fase ...")
-    elemen = st.selectbox("Elemen Pembelajaran:", ["Yesus Kristus", "Peserta Didik", "Gereja", "Masyarakat"])
+    elemen = st.selectbox("Elemen Pembelajaran:", ["Yesus Kristus", "Pribadi Murid", "Gereja", "Masyarakat"])
     topik_bahasan = st.text_input("Topik / Pokok Bahasan:", "...")
 
 with col2:
