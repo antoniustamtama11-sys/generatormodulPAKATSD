@@ -9,7 +9,7 @@ st.set_page_config(page_title="Generator RPP Deep Learning", layout="wide")
 
 st.title("⛪ Generator Modul Ajar Pendidikan Agama Katolik SD")
 st.subheader("Berbasis Pembelajaran Mendalam (Deep Learning) - Multi-Pertemuan")
-st.write("Isi formulir di bawah ini untuk merancang modulajar secara otomatis menggunakan AI.")
+st.write("Isi formulir di bawah ini untuk merancang modul ajar secara otomatis menggunakan AI.")
 
 # --- SIDEBAR INPUT ---
 st.sidebar.header("🔑 Pengaturan API Key")
@@ -27,20 +27,19 @@ col1, col2 = st.columns(2)
 
 with col1:
     mapel = st.text_input("Mata Pelajaran:", "Pendidikan Agama Katolik dan Budi Pekerti")
-    kelas_fase = st.text_input("Kelas / Fase:", "Kelas ... / Fase ...")
+    kelas_fase = st.text_input("Kelas / Fase:", "Kelas 4 / Fase B")
     elemen = st.selectbox("Elemen Pembelajaran:", ["Yesus Kristus", "Pribadi Murid", "Gereja", "Masyarakat"])
-    topik_bahasan = st.text_input("Topik / Pokok Bahasan:", "...")
+    topik_bahasan = st.text_input("Topik / Pokok Bahasan:", "Aku Bangga Sebagai Bangsa Indonesia")
 
 with col2:
-    tujuan_pembelajaran = st.text_area("Tujuan Pembelajaran:", "Murid Memahami ...")
-    kktp = st.text_area("Kriteria Ketercapaian Pembelajaran (KKTP):", "1. ...")
+    tujuan_pembelajaran = st.text_area("Tujuan Pembelajaran:", "Murid mampu memahami nilai-nilai kebangsaan...")
+    kktp = st.text_area("Kriteria Ketercapaian Pembelajaran (KKTP):", "1. Menyebutkan keanekaragaman suku dan budaya\n2. Menjelaskan ajaran Gereja tentang cinta tanah air")
     waktu = st.number_input("Jumlah Pertemuan (1 Pertemuan = 105 Menit):", min_value=1, max_value=10, value=2)
 
 st.header("⚙️ Parameter Pembelajaran Mendalam")
 col3, col4 = st.columns(2)
 
 with col3:
-    # --- PERUBAHAN DI SINI: Menggunakan st.multiselect untuk 8 Profil Dimensi Lulusan ---
     opsi_dimensi = [
         "Keimanan dan Ketakwaan terhadap Tuhan YME",
         "Kewargaan",
@@ -58,7 +57,6 @@ with col3:
         default=["Keimanan dan Ketakwaan terhadap Tuhan YME", "Penalaran Kritis"]
     )
     
-    # Menggabungkan hasil list multiselect menjadi satu string yang dipisahkan koma
     dimensi_profil_lulusan = ", ".join(dimensi_terpilih) if dimensi_terpilih else "Tidak ada dimensi yang dipilih"
 
     praktik_pedagogis = st.text_input("Praktik Pedagogis:", "Diskusi, Kateketis")
@@ -72,7 +70,6 @@ with col4:
 # --- FUNGSI MERUBAH TEKS MENJADI DOCX DI MEMORI ---
 def buat_file_docx(teks_rpp):
     doc = Document()
-    # Atur ukuran halaman A4
     section = doc.sections[0]
     section.page_width = Mm(210)
     section.page_height = Mm(297)
@@ -82,8 +79,18 @@ def buat_file_docx(teks_rpp):
     font.name = 'Arial'
     font.size = Pt(11)
     
-    # Hapus tag HTML dasar agar tidak mengotori Word dokumen
-    bersih_teks = teks_rpp.replace("<p>", "").replace("</p>", "\n").replace("<h1>", "\n\n").replace("</h1>", "\n").replace("<h2>", "\n\n").replace("</h2>", "\n").replace("<h3>", "\n\n").replace("</h3>", "\n")
+    bersih_teks = (
+        teks_rpp.replace("<p>", "")
+        .replace("</p>", "\n")
+        .replace("<h1>", "\n\n")
+        .replace("</h1>", "\n")
+        .replace("<h2>", "\n\n")
+        .replace("</h2>", "\n")
+        .replace("<h3>", "\n\n")
+        .replace("</h3>", "\n")
+        .replace("<br>", "\n")
+        .replace("<br/>", "\n")
+    )
     
     for baris in bersih_teks.split('\n'):
         doc.add_paragraph(baris)
@@ -98,14 +105,14 @@ if st.button("🚀 Generate RPP / Modul Ajar", type="primary"):
     if not api_key:
         st.error("Silakan masukkan API Key Anda di sidebar terlebih dahulu!")
     else:
-        with st.spinner(f"Sedang merancang RPP untuk {waktu} pertemuan... Mohon tunggu sekitar 15-20 detik."):
+        with st.spinner(f"Sedang merancang RPP untuk {waktu} pertemuan... Mohon tunggu beberapa detik."):
             try:
-                client = genai.Client(api_key=api_key)
+                client = genai.Client(api_key=api_key.strip())
                 
                 prompt_text = f"""
-                saya adalah guru pendidikan agama katolik jenjang Sekolah Dasar, Buatkan Rencana Pelaksanaan Pembelajaran (RPP) / Modul Ajar berbasis Pembelajaran Mendalam (Deep Learning) secara LENGKAP untuk {waktu} pertemuan. rancangan pembelajaran harus sesuai dengan tahapan belajar perkembangan anak usia sekolah dasar, buat bahasa yang sederhana dan mudah dipahami oleh anak  usia sekolah dasar.
-                Gunakan Alkitab, ajaran sosial gereja Katolik, Katekismus gereja katolik dan Kitab hukum kanonik sebagai referensi utama. gunakan juga file buku pendidikan agama kalolik di link berikut sebagai referesi sesuai dengan jenjang kelas: https://drive.google.com/drive/folders/1OVx6e_Dek1oDs_jBgHPbMEEFAVtpk4EW?usp=sharing. 
-                Setiap 1 pertemuan terdiri dari 105 menit. Bagi waktu di setiap pertemuan agar sesuai dengan kegiatan awal, kegiatan inti, dan penutup. gunakan rumusan Dimensi Profil Lulusan bukan Dimensi profil Pelajar pancasila
+                Saya adalah guru Pendidikan Agama Katolik jenjang Sekolah Dasar. Buatkan Rencana Pelaksanaan Pembelajaran (RPP) / Modul Ajar berbasis Pembelajaran Mendalam (Deep Learning) secara LENGKAP untuk {waktu} pertemuan. Rancangan pembelajaran harus sesuai dengan tahapan belajar perkembangan anak usia sekolah dasar, gunakan bahasa yang sederhana dan mudah dipahami oleh anak usia sekolah dasar.
+                Gunakan Alkitab, Ajaran Sosial Gereja Katolik, Katekismus Gereja Katolik, dan Kitab Hukum Kanonik sebagai referensi utama.
+                Setiap 1 pertemuan terdiri dari 105 menit. Bagi waktu di setiap pertemuan agar sesuai dengan kegiatan awal, kegiatan inti, dan penutup. Gunakan rumusan Dimensi Profil Lulusan bukan Dimensi Profil Pelajar Pancasila.
                 
                 PENTING: Anda harus menyusun output ini menggunakan format HTML murni yang rapi dan elegan agar langsung siap dicetak di kertas A4.
                 Jangan gunakan markdown biasa (seperti ## atau **). Gunakan tag HTML seperti <h1>, <h2>, <p>, <ul>, <li>, dan <table>.
@@ -115,26 +122,30 @@ if st.button("🚀 Generate RPP / Modul Ajar", type="primary"):
                 - Mata Pelajaran: {mapel} | Kelas/Fase: {kelas_fase} | Elemen: {elemen}
                 - Topik/Pokok Bahasan: {topik_bahasan} | Tujuan Pembelajaran: {tujuan_pembelajaran}
                 - Total Waktu Rencana: {waktu} Pertemuan | KKTP: {kktp}
-                - Dimensi Profil Lulusan: {dimensi_profil_lulusan} | Praktik Pedagogis: sesuaikan dengan rancangan pembelajaran {praktik_pedagogis}
+                - Dimensi Profil Lulusan: {dimensi_profil_lulusan} | Praktik Pedagogis: {praktik_pedagogis}
                 - Lingkungan: {lingkungan_pembelajaran} | Kemitraan: {kemitraan_pembelajaran}
                 - Digital: {pemanfaatan_digital} | Persiapan: {persiapan_pembelajaran}
                 
                 Struktur RPP harus mengikuti susunan berikut:
-                - Judul Modul yang menarik dan inspiratif di bagian atas.
-                - 1. Identitas modul memuat: mapel, Kelas/Fase, elemen, Sekolah, Penulis, topik/Pokok Bahasan, Tujuan Pembelajaran, Kriteria Ketercapaian Pembelajaran, Dimensi profil lulusan, Alokasi Waktu (Buat rapi di dalam tabel HTML)
-                - 2. Desain Pembelajaran memuat: Tujuan pembelajaran, Kriteria ketercapaian pembelajaran, Praktik pedagogis, Lingkungan Pembelajaran, Kemitraan Pembelajaran, Pemanfaatan Digital, Persiapan Pembelajaran dan  Tahapan Pembelajaran: Tentukan dibagian pembelajaran mana yang merupakan tahapan pembaelajaran mendalam tentang Memahami (Understanding) Mengaplikasi (Applying)dan Merefleksi (Reflecting)  (Buat rapi di dalam tabel HTML).
-                - 3. Langkah Pembelajaran: Wajib dijabarkan detail satu per satu dari Pertemuan 1 sampai Pertemuan ke-{waktu}. Setiap pertemuan memuat Kegiatan Awal (sesuaikan waktu: memuat Apersepsi, Motivasi, Asesmen Diagnostik, Tujuan Pembelajaran, Manfaat Pembelajaran), Kegiatan Inti (sesuikan waktu: gunakan tahapan atau sintak pembelajaran pada praktik pedagogis yang dipilih, perhatikan aspek Meaningful, Eksplorasi Mendalam, dan Diskusi/Kolaborasi), Kegiatan Akhir (sesuaikan: berisi rangkuman atau kesimpulan pembelajaran dan refleksi, Fokus pada aspek Joyful, Refleksi, dan Apresiasi).
-                - 4. Asesmen Formatif & Lembar Kerja Murid (LKM) untuk tiap pertemuan.
-                - 5. Asesmen Sumatif (5 soal menjodohkan, 5 soal benar salah, 10 soal pilihan ganda HOTS dengan 4 obsi jawaban dan Kunci Jawaban sesuai dengan KKTP).
-                - 6. Referensi / Daftar Pustaka (penulisan harus sesuai dengan kaedah penulisan daftar pustaka.
+                1. Judul Modul yang menarik dan inspiratif di bagian atas.
+                2. Identitas modul (mapel, Kelas/Fase, elemen, Sekolah, Penulis, topik/Pokok Bahasan, Tujuan Pembelajaran, Kriteria Ketercapaian Pembelajaran, Dimensi Profil Lulusan, Alokasi Waktu) di dalam tabel HTML rapi.
+                3. Desain Pembelajaran (Tujuan pembelajaran, Kriteria ketercapaian pembelajaran, Praktik pedagogis, Lingkungan Pembelajaran, Kemitraan Pembelajaran, Pemanfaatan Digital, Persiapan Pembelajaran dan Tahapan Pembelajaran: Memahami/Understanding, Mengaplikasi/Applying, dan Merefleksi/Reflecting) di dalam tabel HTML.
+                4. Langkah Pembelajaran detail untuk Pertemuan 1 sampai ke-{waktu}. Setiap pertemuan berisi:
+                   - Kegiatan Awal (Apersepsi, Motivasi, Asesmen Diagnostik, Tujuan & Manfaat Pembelajaran)
+                   - Kegiatan Inti (Meaningful, Eksplorasi Mendalam, Diskusi/Kolaborasi)
+                   - Kegiatan Akhir (Rangkuman/Kesimpulan, Joyful, Refleksi, Apresiasi)
+                5. Asesmen Formatif & Lembar Kerja Murid (LKM) untuk tiap pertemuan.
+                6. Asesmen Sumatif (5 soal menjodohkan, 5 soal benar/salah, 10 soal pilihan ganda HOTS dengan 4 opsi jawaban dan Kunci Jawaban sesuai KKTP).
+                7. Referensi / Daftar Pustaka sesuai kaidah penulisan daftar pustaka.
                 
-                Di akhir halaman dokumen, buatlah layout tanda tangan kiri-kanan menggunakan tabel HTML transparan:
+                Di akhir halaman dokumen, buatlah layout tanda tangan kiri-kanan menggunakan tabel HTML transparan (tanpa border):
                 Sebelah kiri: Mengetahui, Kepala Sekolah {kepala_sekolah} (NIP: {nip_kepala_sekolah})
                 Sebelah kanan: Metro, Penulis {penulis} (NIP: {nip_penulis})
                 """
                 
+                # Menggunakan model gemini-3.8-flash sesuai petunjuk API
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-3.8-flash',
                     contents=prompt_text,
                 )
                 
@@ -149,11 +160,10 @@ if 'rpp_html' in st.session_state:
     st.markdown("---")
     st.header("📄 Menu Aksi & Pratinjau Dokumen")
     
-    # Membuat tombol-tombol aksi berdampingan yang berfungsi 100%
     btn_col1, btn_col2, btn_col3 = st.columns(3)
     
     with btn_col1:
-        st.info("💡 **Untuk Cetak ke A4 / Simpan ke PDF:** Tekan kombinasi tombol **Ctrl + P** (Windows) atau **Cmd + P** (Mac) di keyboard Anda saat berada di halaman ini.")
+        st.info("💡 **Cetak ke A4 / Simpan PDF:** Tekan **Ctrl + P** (Windows) atau **Cmd + P** (Mac).")
         
     with btn_col2:
         file_docx = buat_file_docx(st.session_state['rpp_html'])
@@ -166,13 +176,12 @@ if 'rpp_html' in st.session_state:
         
     with btn_col3:
         st.download_button(
-            label="🌐 Unduh File Kode HTML Resmi",
+            label="🌐 Unduh File Kode HTML",
             data=st.session_state['rpp_html'],
             file_name=f"RPP_{mapel.replace(' ', '_')}.html",
             mime="text/html"
         )
     
-    # Tampilkan halaman cetak yang bersih
     html_content = f"""
     <div style="padding: 30px; border: 1px solid #ccc; background-color: white; color: black; font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto;">
         {st.session_state['rpp_html']}
